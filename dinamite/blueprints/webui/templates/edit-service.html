@@ -1,9 +1,9 @@
 {% extends "template.html" %}
 {% block conteudo %}
-      <form class="formularioJogo" method="post" action="{{ url_for('update_service') }}" enctype="multipart/form-data" >
+      <form class="formularioJogo" method="post" action="{{ url_for('webui.update_service') }}" enctype="multipart/form-data" >
 
         <figure class="img thumbnail col-md-4 formularioImagem">
-          <img class="img-fluid" src="{{ url_for('image', file_name=img_service) }}">
+          <img class="img-fluid" src="{{ url_for('webui.image', file_name=img_service) }}">
           <figcaption>
             <label class="fileContainer">
               Mudar Imagem Serviço
@@ -29,7 +29,7 @@
           </div>
           <div class="form-group buttons">
             {{ form.salvar(class="btn btn-primary") }}
-            <a class="btn btn-danger" href="{{ url_for('index') }}">Voltar</a>
+            <a class="btn btn-danger" href="{{ url_for('webui.index') }}">Voltar</a>
           </div>
         </fieldset>
       </form>

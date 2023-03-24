@@ -10,7 +10,7 @@
   <body>
       <div class="container">
         <div class="jumbotron jumbotron-fluid banner">
-            <img src="uploads/moura-fundacoes-logo-min.png" alt="moura-fundacoes-logo">
+            <img src="{{ url_for('static', filename='images/moura-fundacoes-logo-min.png') }}" alt="moura-fundacoes-logo">
         </div>
 
         {% with messages = get_flashed_messages() %}
@@ -23,8 +23,8 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('auth') }}">
-            <input type="hidden" name="next" value="{{ next or url_for('index') }}">
+        <form method="POST" action="{{ url_for('webui.auth') }}">
+            <input type="hidden" name="next" value="{{ next or url_for('webui.index') }}">
             {{ form.csrf_token }}
             <div class="form-group">
                 {{ form.nickname.label(class="form-label") }}
@@ -36,7 +36,7 @@
             </div>
             <div class="form-group buttons">
                 {{ form.login(class="btn btn-primary") }}
-                <a class="btn btn-danger" href="{{ url_for('index') }}">Voltar</a>
+                <a class="btn btn-danger" href="{{ url_for('webui.index') }}">Voltar</a>
             </div>
         </form>
     </div>

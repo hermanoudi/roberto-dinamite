@@ -3,9 +3,12 @@ from multiprocessing.reduction import send_handle
 import os
 
 from click import password_option
-from app import app
 from flask_wtf import FlaskForm
 from wtforms import StringField, DecimalField, PasswordField, SubmitField, validators
+
+from dinamite.config import UPLOAD_PATH
+
+upload_path = ''
 
 class FormService(FlaskForm):
     name = StringField('Nome do Serviço', [validators.DataRequired(), validators.Length(min=1, max=200)])
@@ -20,7 +23,8 @@ class FormUser(FlaskForm):
     login = SubmitField('Login')
 
 def reload_file(id):
-    for file_name in os.listdir(app.config['UPLOAD_PATH']):
+    print(f"CAMINHO UPLOAD {UPLOAD_PATH}")
+    for file_name in os.listdir(UPLOAD_PATH):
         if f'services{id}' in file_name:
             return file_name
 
@@ -29,4 +33,10 @@ def reload_file(id):
 def remove_file(id):
     arquivo = reload_file(id)
     if arquivo != 'default-drilling-icon.png':
-        os.remove(os.path.join(app.config['UPLOAD_PATH'], arquivo))
+        os.remove(os.path.join(UPLOAD_PATH, arquivo))
+
+
+def init_app(app):
+    upload_path = app.configuration.UPLOAD_PATH
+
+

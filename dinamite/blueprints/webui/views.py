@@ -1,25 +1,65 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for, send_from_directory
-from app import app, db
-from models import Services
-from helpers import FormService, reload_file, remove_file
+from os import path
+from flask import abort, request, redirect, render_template, session, flash, url_for, send_from_directory
+from flask_bcrypt import check_password_hash
+from dinamite.config import UPLOAD_PATH
+from dinamite.models import Services, Users
+from dinamite.helpers import FormUser, FormService, reload_file, remove_file
+from dinamite.ext.database import db
 import time
 
-@app.route("/")
+upload_path = UPLOAD_PATH
+
 def index():
     serviceList = Services.query.order_by(Services.id)
     return render_template("list-service.html", title="Serviços", price="Preço", unit="Unidade", services=serviceList )
 
 
+# USUARIO
+def login():
+    next_page = request.args.get("next")
+    form = FormUser()    
+    return render_template("login.html", next=next_page, form=form)
 
-@app.route("/new-service")
+
+def auth():
+
+    form = FormUser(request.form)
+
+    user = Users.query.filter_by(nickname=form.nickname.data).first()
+    password = check_password_hash(user.password, form.password.data)
+    
+    if user and password:
+    
+        session['user_logged'] = user.nickname
+        flash(user.nickname + ' logado com sucesso!')
+        next_page = request.form["next"]
+
+        if next_page == 'None' or next_page == '':
+            print("vai retornar para INDEX")
+            return redirect(url_for("webui.index"))
+        else:
+            print("vai retornar para NEXT")
+            return redirect(next_page)     
+    else:
+        flash('user not logged.')
+        return redirect(url_for("webui.login"))
+    
+
+
+def logout():
+    session['user_logged'] = None
+    flash("Logout efetuado com sucesso!")
+    return redirect(url_for("webui.index"))
+
+
 def new_service():
     if 'user_logged' not in session or session ['user_logged'] == None:
-        return redirect(url_for("login", next=url_for("new_service")))
+        return redirect(url_for("webui.login", next=url_for("webui.new_service")))
     form = FormService ()
 
     return render_template("new-service.html", title="Novo Serviço", form=form)
 
-@app.route("/edit-service/<int:id>")
+
 def edit_service(id):
     if 'user_logged' not in session or session ['user_logged'] == None:
         return redirect(url_for("login", next=url_for("edit_service", id=id)))
@@ -34,9 +74,9 @@ def edit_service(id):
 
     return render_template("edit-service.html", title="Editando Serviço", id=id, img_service=img_service, form=form)
 
-@app.route("/update-service", methods=['POST',])
-def update_service():
 
+def update_service():
+    
     form = FormService(request.form)
 
     if form.validate_on_submit():
@@ -50,17 +90,17 @@ def update_service():
         db.session.commit()
 
         image = request.files['image']
-        upload_path = app.config['UPLOAD_PATH']
+        
 
         timestamp = time.time()
 
         remove_file(service.id)
         image.save(f'{upload_path}/services{service.id}-{timestamp}.png')
 
-    return redirect( url_for("index") )
+    return redirect( url_for("webui.index") )
 
 
-@app.route("/delete-service/<int:id>")
+
 def delete_service(id):
     if 'user_logged' not in session or session ['user_logged'] == None:
         return redirect(url_for("login"))
@@ -69,11 +109,11 @@ def delete_service(id):
     db.session.commit()
     flash("Serviço removido com sucesso")
 
-    return redirect(url_for("index"))
+    return redirect(url_for("webui.index"))
 
 
 
-@app.route("/create-service", methods=['POST',])
+
 def create_service():
     form = FormService(request.form)
 
@@ -87,19 +127,22 @@ def create_service():
     service = Services.query.filter_by(name=name).first()
     if service:
         flash("Serviço já existe!")
-        return redirect(url_for("index"))
+        return redirect(url_for("webui.index"))
 
     new_service = Services(name=name, price=price, unit=unit)
     db.session.add(new_service)
     db.session.commit()
 
     image = request.files['image']
-    upload_path = app.config['UPLOAD_PATH']
+    
     image.save(f'{upload_path}/services{new_service.id}-{image.filename}')
 
-    return redirect(url_for("index"))
+    return redirect(url_for("webui.index"))
 
 
-@app.route("/uploads/<file_name>")
 def image(file_name):
     return send_from_directory('uploads', file_name)
+
+
+def init_app(app):
+    upload_path = app.configuration.UPLOAD_PATH
