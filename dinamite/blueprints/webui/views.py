@@ -5,6 +5,7 @@ from dinamite.config import UPLOAD_PATH
 from dinamite.models import Services, Users
 from dinamite.helpers import FormUser, FormService, reload_file, remove_file
 from dinamite.ext.database import db
+from flask_simplelogin import get_username, is_logged_in, login_required
 import time
 
 upload_path = UPLOAD_PATH
@@ -14,49 +15,10 @@ def index():
     return render_template("list-service.html", title="Serviços", price="Preço", unit="Unidade", services=serviceList )
 
 
-# USUARIO
-def login():
-    next_page = request.args.get("next")
-    form = FormUser()    
-    return render_template("login.html", next=next_page, form=form)
-
-
-def auth():
-
-    form = FormUser(request.form)
-
-    user = Users.query.filter_by(nickname=form.nickname.data).first()
-    password = check_password_hash(user.password, form.password.data)
-    
-    if user and password:
-    
-        session['user_logged'] = user.nickname
-        flash(user.nickname + ' logado com sucesso!')
-        next_page = request.form["next"]
-
-        if next_page == 'None' or next_page == '':
-            print("vai retornar para INDEX")
-            return redirect(url_for("webui.index"))
-        else:
-            print("vai retornar para NEXT")
-            return redirect(next_page)     
-    else:
-        flash('user not logged.')
-        return redirect(url_for("webui.login"))
-    
-
-
-def logout():
-    session['user_logged'] = None
-    flash("Logout efetuado com sucesso!")
-    return redirect(url_for("webui.index"))
-
-
+@login_required
 def new_service():
-    if 'user_logged' not in session or session ['user_logged'] == None:
-        return redirect(url_for("webui.login", next=url_for("webui.new_service")))
-    form = FormService ()
 
+    form = FormService ()
     return render_template("new-service.html", title="Novo Serviço", form=form)
 
 

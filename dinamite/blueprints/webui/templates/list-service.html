@@ -1,7 +1,7 @@
 {% extends "template.html" %}
 {% block conteudo %}
-        <a class="btn btn-primary" href="{{ url_for('webui.login') }}">Login</a>
-        <a class="btn btn-danger" href="{{ url_for('webui.logout') }}">Logout</a>
+        <a class="btn btn-primary" href="{{ url_for('simplelogin.login') }}">Login</a>
+        <a class="btn btn-danger" href="{{ url_for('simplelogin.logout') }}">Logout</a>
         <a class="btn btn-primary" href="{{ url_for('webui.new_service') }}">Novo Serviço</a>
         <table class="table table-striped table-responsive table-bordered">
             <thead class="thead-default">

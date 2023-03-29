@@ -1,12 +1,19 @@
 [default]
 DEBUG = false
+FLASK_ADMIN_NAME = "Roberto Dinamite Admin"
+FLASK_ADMIN_TEMPLATE_MODE = "bootstrap3"
+FLASK_ADMIN_SWATCH = 'cerulean'
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/dinamite'
 UPLOAD_PATH = "os.path.dirname(os.path.abspath(__file__)) + '/uploads'"
+TITLE = "Roberto Dinamite"
 SECRET_KEY = "vasco"
+PASSWORD_SCHEMES = ['pbkdf2_sha512', 'md5_crypt']
 EXTENSIONS = [
     "dinamite.ext.appearance:init_app",
     "dinamite.ext.database:init_app",
+    "dinamite.ext.auth:init_app",
     "dinamite.ext.protect:init_app",
+    "dinamite.ext.admin:init_app",
     "dinamite.blueprints.webui:init_app",
     "dinamite.blueprints.restapi:init_app",
 ]

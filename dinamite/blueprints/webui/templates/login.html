@@ -27,8 +27,8 @@
             <input type="hidden" name="next" value="{{ next or url_for('webui.index') }}">
             {{ form.csrf_token }}
             <div class="form-group">
-                {{ form.nickname.label(class="form-label") }}
-                {{ form.nickname(class="form-control") }}
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
             </div>
             <div class="form-group">
                 {{ form.password.label(class="form-label") }}

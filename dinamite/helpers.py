@@ -18,7 +18,7 @@ class FormService(FlaskForm):
 
 
 class FormUser(FlaskForm):
-    nickname = StringField('Nickname', [validators.DataRequired(), validators.Length(min=1, max=30)])
+    username = StringField('Username', [validators.DataRequired(), validators.Length(min=1, max=30)])
     password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=1, max=100)])
     login = SubmitField('Login')
 
